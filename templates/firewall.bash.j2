@@ -76,7 +76,14 @@ iptables -A INPUT -p icmp -j ACCEPT
 {{ rule }}
 {% endfor %}
 
+
+{% if firewall_enable_forwarding %}
+# Enable forwarding
+echo 1 > /proc/sys/net/ipv4/ip_forward
+{% endif %}
+
 {% if firewall_enable_masquerade %}
+#Enable Masquerade
 {% for interface in firewall_masquerade_interfaces %}
 iptables -t nat -A POSTROUTING -o {{ interface }} -j MASQUERADE 
 {% endfor %}
