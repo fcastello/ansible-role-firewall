@@ -1,0 +1,25 @@
+---
+dependencies: []
+
+galaxy_info:
+  author: fcastello
+  description: Iptables firewall for home linux router
+  company: "pancho.dev"
+  license: "license (MIT)"
+  min_ansible_version: 2.7
+  platforms:
+    - name: Debian
+      versions:
+        - all
+    - name: Ubuntu
+      versions:
+        - all
+  galaxy_tags:
+    - networking
+    - system
+    - security
+    - firewall
+    - iptables
+    - tcp
+    - masquerade
+    - nat

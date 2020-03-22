@@ -1,0 +1,23 @@
+#!/usr/bin/env ansible-playbook
+
+- name: Run Firewall
+  hosts: all
+  gather_facts: yes
+  become: yes
+
+  vars:
+    firewall_masquerade_interfaces: 
+      - "enp1s0"
+    firewall_allowed_tcp_ports: 
+      - "22"
+    firewall_whitelist: 
+      - 192.168.0.0/16
+      - 10.0.0.0/8
+      - 172.16.0.0/12
+    # To allow to reboot if something goes wrong
+    firewall_enabled_at_boot: false
+
+  tasks:
+    - name: deploy firewall
+      import_role:
+        name: ../../ansible-role-firewall
