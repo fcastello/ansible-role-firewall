@@ -9,6 +9,17 @@ This role is based from https://github.com/geerlingguy/ansible-role-firewall som
 - systemd:  A basic minimal install of ubuntu 18.04 alredy had systemd installed.
 
 
+# Limitations
+- Only supports on IPv4
+
+# To Do
+- Add an easied way to local test/develop using a vagrant vm
+- Add support for port forwards to internal hosts
+- Add support for port redirections
+- Add support for SNAT instead of Masquerade only
+- Add ipv6 support
+- Add better support for multihomed ISP, Right now is very basic to enable masquerade in multiple interfaces.
+
 
 # Disclaimer
 
