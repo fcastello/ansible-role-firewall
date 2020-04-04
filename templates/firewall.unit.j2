@@ -4,7 +4,7 @@ After=syslog.target network.target
 
 [Service]
 Type=oneshot
-ExecStart=/etc/firewall.bash start 
+ExecStart=/etc/firewall.bash start
 ExecStop=/etc/firewall.bash stop
 RemainAfterExit=yes
 

@@ -31,12 +31,12 @@ iptables -P FORWARD DROP
 
 # All hosts and networks that have been blacklisted
 {% for blacklisted in firewall_blacklist %}
-iptables -t filter -I INPUT -s {{ blacklisted }} -j DROP 
-iptables -t filter -I FORWARD -s {{ blacklisted }} -j DROP 
+iptables -t filter -I INPUT -s {{ blacklisted }} -j DROP
+iptables -t filter -I FORWARD -s {{ blacklisted }} -j DROP
 {% endfor %}
 
 # Custom rules applied before all other firewall rules
-{% for rule in firewall_additional_rules_pre %} 
+{% for rule in firewall_additional_rules_pre %}
 {{ rule }}
 {% endfor %}
 
@@ -51,10 +51,10 @@ iptables -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT
 
 # All hosts and networks that have been whitelisted
 {% for whitelisted in firewall_whitelist %}
-iptables -I INPUT -s {{ whitelisted }} -j ACCEPT 
-iptables -I FORWARD -s {{ whitelisted }} -j ACCEPT 
-iptables -I INPUT -d {{ whitelisted }} -j ACCEPT 
-iptables -I FORWARD -d {{ whitelisted }} -j ACCEPT 
+iptables -I INPUT -s {{ whitelisted }} -j ACCEPT
+iptables -I FORWARD -s {{ whitelisted }} -j ACCEPT
+iptables -I INPUT -d {{ whitelisted }} -j ACCEPT
+iptables -I FORWARD -d {{ whitelisted }} -j ACCEPT
 {% endfor %}
 
 # Open ports. Add a rule for each allowed port.
@@ -72,7 +72,7 @@ iptables -A INPUT -p icmp -j ACCEPT
 
 
 # Custom rules after standard rules Have been applied
-{% for rule in firewall_additional_rules_post %} 
+{% for rule in firewall_additional_rules_post %}
 {{ rule }}
 {% endfor %}
 
@@ -85,7 +85,7 @@ echo 1 > /proc/sys/net/ipv4/ip_forward
 {% if firewall_enable_masquerade %}
 #Enable Masquerade
 {% for interface in firewall_masquerade_interfaces %}
-iptables -t nat -A POSTROUTING -o {{ interface }} -j MASQUERADE 
+iptables -t nat -A POSTROUTING -o {{ interface }} -j MASQUERADE
 {% endfor %}
 {% endif %}
 
@@ -106,7 +106,7 @@ iptables -A FORWARD -m limit --limit 15/minute -j LOG --log-level 7 --log-prefix
 
 # Firewall flushes all rules and sets the default policies to ACCEPT
 firewall_stop() {
-{% endraw %}    
+{% endraw %}
 # Set the default rules.
 iptables -P INPUT ACCEPT
 iptables -P FORWARD ACCEPT

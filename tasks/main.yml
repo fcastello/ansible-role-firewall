@@ -35,4 +35,3 @@
 
 - import_tasks: disable-other-firewalls.yml
   when: firewall_disable_ufw
-  
