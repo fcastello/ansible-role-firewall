@@ -1,7 +1,9 @@
 ---
 dependencies: []
 
+
 galaxy_info:
+  role_name: firewall
   author: fcastello
   description: Iptables firewall for home linux router
   company: "pancho.dev"
@@ -14,6 +16,7 @@ galaxy_info:
     - name: Ubuntu
       versions:
         - all
+
   galaxy_tags:
     - networking
     - system
