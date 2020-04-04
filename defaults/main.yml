@@ -20,7 +20,7 @@ firewall_enable_masquerade: true
 # Enable  packet forwarding
 firewall_enable_forwarding: true
 # Interfaces to enable masquerade on
-firewall_masquerade_interfaces: 
+firewall_masquerade_interfaces:
   - "eth1"
 
 ## FIREWALL CONFIG
@@ -42,13 +42,13 @@ firewall_blacklist: []
 firewall_whitelist: []
 
 # Example: Whitelist all common private subnets
-# firewall_whitelist: 
+# firewall_whitelist:
 #   - 192.168.0.0/16
 #   - 10.0.0.0/8
 #   - 172.16.0.0/12
 
 ## Custom Rules
-# Custom rules are used to define the raw iptables rules when needing special use cases, 
+# Custom rules are used to define the raw iptables rules when needing special use cases,
 # NOTE: you will have to specify the entire iptables command in order to work
 
 # Additional rules are custom rules to be applied before the standarrd rules

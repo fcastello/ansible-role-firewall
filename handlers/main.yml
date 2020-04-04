@@ -1,5 +1,5 @@
 ---
 - name: restart firewall
   service: 
-    name: firewall 
+    name: firewall
     state: restarted

@@ -1,7 +1,7 @@
 ---
 - name: Ensure iptables is present.
-  package: 
-    name: iptables 
+  package:
+    name: iptables
     state: present
 
 - name: Flush iptables the first time playbook runs.
@@ -35,3 +35,4 @@
 
 - import_tasks: disable-other-firewalls.yml
   when: firewall_disable_ufw
+  
