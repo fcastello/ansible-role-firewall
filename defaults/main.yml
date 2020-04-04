@@ -23,11 +23,8 @@ firewall_enable_forwarding: true
 firewall_masquerade_interfaces: 
   - "eth1"
 
-
-
 ## FIREWALL CONFIG
 # The firewall config asumes the same rules will apply to INPUT and FORWARD chains. OUTPUT chain will Allow everything as it is the server in question If the is a need for more complex rules they will need to be added to the firewall_additional_rules_pre and firewall_additional_rules_post
-
 
 # Filtering rules
 firewall_allowed_tcp_ports:
@@ -59,6 +56,3 @@ firewall_additional_rules_pre: []
 
 # Additional rules are custom rules to be applied after the standarrd rules
 firewall_additional_rules_post: []
-
-
-
