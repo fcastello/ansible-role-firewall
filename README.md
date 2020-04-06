@@ -91,7 +91,6 @@ firewall_additional_rules_post: []
 # To Do
 - Add an easied way to local test/develop using a vagrant vm
 - Add support for port forwards to internal hosts
-- Add support for port redirections
 - Add support for SNAT instead of Masquerade only
 - Add ipv6 support
 - Add better support for multihomed ISP, Right now is very basic to enable masquerade in multiple interfaces.
