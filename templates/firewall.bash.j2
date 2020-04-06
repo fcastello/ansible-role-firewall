@@ -43,6 +43,17 @@ iptables -t filter -I FORWARD -s {{ blacklisted }} -j DROP
 # Accept traffic from loopback interface (localhost).
 iptables -A INPUT -i lo -j ACCEPT
 
+# Port Redirection
+{# Add a rule for each forwarded port #}
+{% for redirected_port in firewall_redirected_tcp_ports %}
+iptables -t nat -I PREROUTING -p tcp --dport {{ redirected_port.src }} -j REDIRECT --to-port {{ redirected_port.dest }}
+iptables -t nat -I OUTPUT -p tcp -o lo --dport {{ redirected_port.src }} -j REDIRECT --to-port {{ redirected_port.dest }}
+{% endfor %}
+{% for redirected_port in firewall_forwarded_udp_ports %}
+iptables -t nat -I PREROUTING -p udp --dport {{ redirected_port.src }} -j REDIRECT --to-port {{ redirected_port.dest }}
+iptables -t nat -I OUTPUT -p udp -o lo --dport {{ redirected_port.src }} -j REDIRECT --to-port {{ redirected_port.dest }}
+{% endfor %}
+
 # Allow established connections, this is added early to help with performance.
 # if a connection is already established it means it was already accepted so no need to
 # keep evalueation everything
