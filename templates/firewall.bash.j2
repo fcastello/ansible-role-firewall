@@ -49,7 +49,7 @@ iptables -A INPUT -i lo -j ACCEPT
 iptables -t nat -I PREROUTING -p tcp --dport {{ redirected_port.src }} -j REDIRECT --to-port {{ redirected_port.dest }}
 iptables -t nat -I OUTPUT -p tcp -o lo --dport {{ redirected_port.src }} -j REDIRECT --to-port {{ redirected_port.dest }}
 {% endfor %}
-{% for redirected_port in firewall_forwarded_udp_ports %}
+{% for redirected_port in firewall_redirected_udp_ports %}
 iptables -t nat -I PREROUTING -p udp --dport {{ redirected_port.src }} -j REDIRECT --to-port {{ redirected_port.dest }}
 iptables -t nat -I OUTPUT -p udp -o lo --dport {{ redirected_port.src }} -j REDIRECT --to-port {{ redirected_port.dest }}
 {% endfor %}
