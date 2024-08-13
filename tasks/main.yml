@@ -16,7 +16,7 @@
     owner: root
     group: root
     mode: "0744"
-  notify: restart firewall
+  notify: Restart firewall
 
 - name: Copy firewall systemd unit file into place (for systemd systems).
   ansible.builtin.template:
