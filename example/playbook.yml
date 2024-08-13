@@ -2,8 +2,8 @@
 
 - name: Run Firewall
   hosts: all
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
 
   vars:
     firewall_masquerade_interfaces:
@@ -18,6 +18,6 @@
     firewall_enabled_at_boot: false
 
   tasks:
-    - name: deploy firewall
-      import_role:
+    - name: Deploy firewall
+      ansible.builtin.import_role:
         name: ../../ansible-role-firewall

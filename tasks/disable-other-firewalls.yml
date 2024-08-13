@@ -6,11 +6,11 @@
 
 
 - name: Disable the ufw firewall (on Ubuntu, if configured).
-  service:
+  ansible.builtin.service:
     name: ufw
     state: stopped
     enabled: false
   when:
     - ansible_distribution == "Ubuntu"
     - firewall_disable_ufw
-    -  ufw_status.status.UnitFileState == "enabled"
+    - ufw_status.status.UnitFileState == "enabled"
