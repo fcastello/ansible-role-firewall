@@ -24,7 +24,9 @@ firewall_masquerade_interfaces:
   - "eth1"
 
 ## FIREWALL CONFIG
-# The firewall config asumes the same rules will apply to INPUT and FORWARD chains. OUTPUT chain will Allow everything as it is the server in question If the is a need for more complex rules they will need to be added to the firewall_additional_rules_pre and firewall_additional_rules_post
+# The firewall config asumes the same rules will apply to INPUT and FORWARD chains. OUTPUT chain will Allow
+# everything as it is the server in question If the is a need for more complex rules they will need to be
+# added to the firewall_additional_rules_pre and firewall_additional_rules_post
 
 # Filtering rules
 firewall_allowed_tcp_ports:
@@ -43,7 +45,8 @@ firewall_forwarded_tcp_ports: []
 firewall_forwarded_udp_ports: []
 
 # This is a list to add either untrusted hosts or networks. It will deny all traffic to this networks and within this networks
-# Should be used when we want to block an external host that is attaking us. This will be the rules evaluated on top of every other rules to block at the earliest
+# Should be used when we want to block an external host that is attaking us.
+# This will be the rules evaluated on top of every other rules to block at the earliest
 # Casn use a single ip or a subnet in CIDR notation
 firewall_blacklist: []
 

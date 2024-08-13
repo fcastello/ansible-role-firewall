@@ -4,8 +4,8 @@ This project is to setup a home linux firewall to protect a standard home intern
 This role is based from https://github.com/geerlingguy/ansible-role-firewall some ideas and structures were taken from this role. 
 
 # requirements
-- ubuntu 18.04. It might work in other ubuntu versions but has been tested with ubuntu 18.04
-- iptables: Ubuntu 18.04 alredy has that installed from a minimal install
+- ubuntu 24.04 Is the supported version. It might work in other ubuntu versions but has been tested with ubuntu 24.04. I was know to work on 18.04 and 22.04.
+- iptables: Ubuntu 24.04 alredy has that installed from a minimal install
 - systemd:  A basic minimal install of ubuntu 18.04 alredy had systemd installed.
 
 
@@ -32,7 +32,7 @@ firewall_debug: false
 
 # Enable masquerade 
 firewall_enable_masquerade: true
-# Enable  packet forwarding in teh kernel
+# Enable  packet forwarding in the kernel
 firewall_enable_forwarding: true
 # Interfaces to enable masquerade on, neets ennable masqurade to TRUE
 firewall_masquerade_interfaces: 
@@ -108,6 +108,7 @@ firewall_additional_rules_post: []
 - Add support for SNAT instead of Masquerade only
 - Add ipv6 support
 - Add better support for multihomed ISP, Right now is very basic to enable masquerade in multiple interfaces.
+- Add support for nftables and the ability to switch between iptables and nftables
 
 
 # Disclaimer

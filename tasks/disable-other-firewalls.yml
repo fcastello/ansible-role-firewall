@@ -1,22 +1,16 @@
 ---
-- name: Check if ufw package is installed (on Ubuntu).
-  command: service ufw status
-  args:
-    warn: false
-  register: ufw_installed
-  ignore_errors: true
-  changed_when: false
-  when:
-    - ansible_distribution == "Ubuntu"
-    - firewall_disable_ufw
-  check_mode: false
+- name: Get ufw Status
+  ansible.builtin.systemd:
+    name: "ufw"
+  register: ufw_status
+
 
 - name: Disable the ufw firewall (on Ubuntu, if configured).
-  service:
+  ansible.builtin.service:
     name: ufw
     state: stopped
     enabled: false
   when:
     - ansible_distribution == "Ubuntu"
     - firewall_disable_ufw
-    - ufw_installed.rc == 0
+    - ufw_status.status.UnitFileState == "enabled"
