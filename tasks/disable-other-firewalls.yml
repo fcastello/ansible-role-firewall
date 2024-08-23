@@ -13,4 +13,4 @@
   when:
     - ansible_distribution == "Ubuntu"
     - firewall_disable_ufw
-    - ufw_status.status.UnitFileState == "enabled"
+    - ufw_status.status.UnitFileState is defined and ufw_status.status.UnitFileState == "enabled"
