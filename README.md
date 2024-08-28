@@ -49,44 +49,51 @@ firewall_allowed_udp_ports: []
 
 # Redirected ports. This is set for ports to be redirected to different ports on the same host
 firewall_redirected_tcp_ports: 
-  - src: "22"
-    dest: "2222"
-  - src: "80"
-    dest: "8080"
+  IPv4:
+    - src: "22"
+      dest: "2222"
+    - src: "80"
+      dest: "8080"
 
 firewall_redirected_udp_ports: 
-  - src: "53"
-    dest: "19053"
+  IPv4:
+   - src: "53"
+     dest: "19053"
 
 # Forwarded ports. This is set for ports to be forwarded to different host
 # Port forwards are applied to all masqueraded interfaces
 # Note that adding a port forward adds an implicit accept all rule for the forwarded port. 
 # If more control is needed, raw rules can be added in the firewall_additional_rules_pre rules.
 firewall_redirected_tcp_ports: 
-  - port: "2222"
-    ip: 192.168.1.2
-    dest_port: "22" # This example forwards the tcp port to 2222 on the router to 22 on 192.168.1.2
+  IPv4:
+    - port: "2222"
+      ip: 192.168.1.2
+      dest_port: "22" # This example forwards the tcp port to 2222 on the router to 22 on 192.168.1.2
 
 firewall_redirected_udp_ports: 
-  - port: "19053"
-    ip: 192.168.1.2
-    dest_port: "53" # This example forwards the udp port to 2222 on the router to 22 on 192.168.1.2
+  IPv4:
+    - port: "19053"
+      ip: 192.168.1.2
+      dest_port: "53" # This example forwards the udp port to 2222 on the router to 22 on 192.168.1.2
 
 # This is a list to add either untrusted hosts or networks. It will deny all traffic to this networks and within this networks
 # Should be used when we want to block an external host that is attaking us. This will be the rules evaluated on top of every other rules to block at the earliest
 # Casn use a single ip or a subnet in CIDR notation
-firewall_blacklist: []
+firewall_blacklist: 
+  IPv4: []
 
 # This is a list to add either trusted hosts or networks. It will allow all traffic to this networks and within this networks
 # useful to add all internal private networks
 # Casn use a single ip or a subnet in CIDR notation
-firewall_whitelist: []
+firewall_whitelist: 
+  IPv4: []
 
 # Example: Whitelist all common private subnets
 # firewall_whitelist: 
-#   - 192.168.0.0/16
-#   - 10.0.0.0/8
-#   - 172.16.0.0/12
+#   IPv4:
+#     - 192.168.0.0/16
+#     - 10.0.0.0/8
+#     - 172.16.0.0/12
 
 ## Custom Rules
 # Custom rules are used to define the raw iptables rules when needing special use cases, 
@@ -101,12 +108,11 @@ firewall_additional_rules_post: []
 
 
 # Limitations
-- Only supports on IPv4
+- The firewall is defined in a way to support a home network or small office network. It is apinionated and it does not support scenarios with filtering between multiple prives networks
 
 # To Do
 - Add an easied way to local test/develop using a vagrant vm
 - Add support for SNAT instead of Masquerade only
-- Add ipv6 support
 - Add better support for multihomed ISP, Right now is very basic to enable masquerade in multiple interfaces.
 - Add support for nftables and the ability to switch between iptables and nftables
 

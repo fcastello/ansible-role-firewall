@@ -29,11 +29,28 @@ firewall_stop
 iptables -P INPUT DROP
 iptables -P FORWARD DROP
 
+# Set policy drop on ipv6 even if ipv6 is disabled.
+# This is to prevent getting opened ports on ipv6 by accident
+ip6tables -P INPUT DROP
+ip6tables -P FORWARD DROP
+
 # All hosts and networks that have been blacklisted
-{% for blacklisted in firewall_blacklist %}
+{% if firewall_forwarded_udp_ports.IPv4 %}
+{% for blacklisted in firewall_blacklist.IPv4 %}
 iptables -t filter -I INPUT -s {{ blacklisted }} -j DROP
 iptables -t filter -I FORWARD -s {{ blacklisted }} -j DROP
 {% endfor %}
+{% endif %}
+
+{% if firewall_enable_ipv6 %}
+{% if firewall_forwarded_udp_ports.IPv6 %}
+{% for blacklisted in firewall_blacklist.IPv6 %}
+ip6tables -t filter -I INPUT -s {{ blacklisted }} -j DROP
+ip6tables -t filter -I FORWARD -s {{ blacklisted }} -j DROP
+{% endfor %}
+{% endif %}
+{% endif %}
+
 
 # Custom rules applied before all other firewall rules
 {% for rule in firewall_additional_rules_pre %}
@@ -45,14 +62,34 @@ iptables -A INPUT -i lo -j ACCEPT
 
 # Port Redirection
 {# Add a rule for each redirected port #}
-{% for redirected_port in firewall_redirected_tcp_ports %}
+{% if firewall_redirected_tcp_ports.IPv4 %}
+{% for redirected_port in firewall_redirected_tcp_ports.IPv4 %}
 iptables -t nat -I PREROUTING -p tcp --dport {{ redirected_port.src }} -j REDIRECT --to-port {{ redirected_port.dest }}
 iptables -t nat -I OUTPUT -p tcp -o lo --dport {{ redirected_port.src }} -j REDIRECT --to-port {{ redirected_port.dest }}
 {% endfor %}
-{% for redirected_port in firewall_redirected_udp_ports %}
+{% endif %}
+{% if firewall_redirected_udp_ports.IPv4 %}
+{% for redirected_port in firewall_redirected_udp_ports.IPv4 %}
 iptables -t nat -I PREROUTING -p udp --dport {{ redirected_port.src }} -j REDIRECT --to-port {{ redirected_port.dest }}
 iptables -t nat -I OUTPUT -p udp -o lo --dport {{ redirected_port.src }} -j REDIRECT --to-port {{ redirected_port.dest }}
 {% endfor %}
+{% endif %}
+
+{% if firewall_enable_ipv6 %}
+{% if firewall_redirected_tcp_ports.IPv6 %}
+{% for redirected_port in firewall_redirected_tcp_ports.IPv6 %}
+iptables -t nat -I PREROUTING -p tcp --dport {{ redirected_port.src }} -j REDIRECT --to-port {{ redirected_port.dest }}
+iptables -t nat -I OUTPUT -p tcp -o lo --dport {{ redirected_port.src }} -j REDIRECT --to-port {{ redirected_port.dest }}
+{% endfor %}
+{% endif %}
+{% if firewall_forwarded_udp_ports.IPv6 %}
+{% for redirected_port in firewall_redirected_udp_ports.IPv6 %}
+iptables -t nat -I PREROUTING -p udp --dport {{ redirected_port.src }} -j REDIRECT --to-port {{ redirected_port.dest }}
+iptables -t nat -I OUTPUT -p udp -o lo --dport {{ redirected_port.src }} -j REDIRECT --to-port {{ redirected_port.dest }}
+{% endfor %}
+{% endif %}
+{% endif %}
+
 
 # Allow established connections, this is added early to help with performance.
 # if a connection is already established it means it was already accepted so no need to
@@ -60,13 +97,32 @@ iptables -t nat -I OUTPUT -p udp -o lo --dport {{ redirected_port.src }} -j REDI
 iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 iptables -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT
 
+{% if firewall_enable_ipv6 %}
+ip6tables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+ip6tables -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT
+{% endif %}
+
 # All hosts and networks that have been whitelisted
-{% for whitelisted in firewall_whitelist %}
+{% if firewall_forwarded_udp_ports.IPv4 %}
+{% for whitelisted in firewall_whitelist.IPv4 %}
 iptables -I INPUT -s {{ whitelisted }} -j ACCEPT
 iptables -I FORWARD -s {{ whitelisted }} -j ACCEPT
 iptables -I INPUT -d {{ whitelisted }} -j ACCEPT
 iptables -I FORWARD -d {{ whitelisted }} -j ACCEPT
 {% endfor %}
+{% endif %}
+
+{% if firewall_enable_ipv6 %}
+{% if firewall_forwarded_udp_ports.IPv6 %}
+{% for whitelisted in firewall_whitelist.IPv6 %}
+ip6tables -I INPUT -s {{ whitelisted }} -j ACCEPT
+ip6tables -I FORWARD -s {{ whitelisted }} -j ACCEPT
+ip6tables -I INPUT -d {{ whitelisted }} -j ACCEPT
+ip6tables -I FORWARD -d {{ whitelisted }} -j ACCEPT
+{% endfor %}
+{% endif %}
+{% endif %}
+
 
 # Open ports. Add a rule for each allowed port.
 {% for port in firewall_allowed_tcp_ports %}
@@ -78,24 +134,58 @@ iptables -A INPUT -p udp -m udp --dport {{ port }} -j ACCEPT
 iptables -A FORWARD -p tcp -m tcp --dport {{ port }} -j ACCEPT
 {% endfor %}
 
+{% if firewall_enable_ipv6 %}
+{% for port in firewall_allowed_tcp_ports %}
+ip6tables -A INPUT -p tcp -m tcp --dport {{ port }} -j ACCEPT
+ip6tables -A FORWARD -p tcp -m tcp --dport {{ port }} -j ACCEPT
+{% endfor %}
+{% for port in firewall_allowed_udp_ports %}
+ip6tables -A INPUT -p udp -m udp --dport {{ port }} -j ACCEPT
+ip6tables -A FORWARD -p tcp -m tcp --dport {{ port }} -j ACCEPT
+{% endfor %}
+{% endif %}
+
 
 # Port Forwards
-{% for forwarded_port in firewall_forwarded_tcp_ports %}
+{% if firewall_forwarded_tcp_ports.IPv4 %}
+{% for forwarded_port in firewall_forwarded_tcp_ports.IPv4 %}
 {% for interface in firewall_masquerade_interfaces %}
 iptables -A PREROUTING -t nat -i {{ interface }} -p tcp --dport {{ forwarded_port.port }} -j DNAT --to {{ forwarded_port.ip }}:{{ forwarded_port.dest_port }}
 {% endfor %}
 iptables -A FORWARD -p tcp -d {{ forwarded_port.ip }} --dport {{ forwarded_port.dest_port }} -j ACCEPT
 {% endfor %}
-
-{% for forwarded_port in firewall_forwarded_udp_ports %}
+{% endif %}
+{% if firewall_forwarded_udp_ports.IPv4 %}
+{% for forwarded_port in firewall_forwarded_udp_ports.IPv4 %}
 {% for interface in firewall_masquerade_interfaces %}
 iptables -A PREROUTING -t nat -i {{ interface }} -p udp --dport {{ forwarded_port.port }} -j DNAT --to {{ forwarded_port.ip }}:{{ forwarded_port.dest_port }}
 {% endfor %}
 iptables -A FORWARD -p udp -d {{ forwarded_port.ip }} --dport {{ forwarded_port.dest_port }} -j ACCEPT
 {% endfor %}
+{% endif %}
+
+{% if firewall_enable_ipv6 %}
+{% if firewall_forwarded_tcp_ports.IPv6 %}
+{% for forwarded_port in firewall_forwarded_tcp_ports.IPv6 %}
+{% for interface in firewall_masquerade_interfaces %}
+ip6tables -A PREROUTING -t nat -i {{ interface }} -p tcp --dport {{ forwarded_port.port }} -j DNAT --to {{ forwarded_port.ip }}:{{ forwarded_port.dest_port }}
+{% endfor %}
+ip6tables -A FORWARD -p tcp -d {{ forwarded_port.ip }} --dport {{ forwarded_port.dest_port }} -j ACCEPT
+{% endfor %}
+{% endif %}
+{% if firewall_forwarded_udp_ports.IPv6 %}
+{% for forwarded_port in firewall_forwarded_udp_ports.IPv6 %}
+{% for interface in firewall_masquerade_interfaces %}
+ip6tables -A PREROUTING -t nat -i {{ interface }} -p udp --dport {{ forwarded_port.port }} -j DNAT --to {{ forwarded_port.ip }}:{{ forwarded_port.dest_port }}
+{% endfor %}
+ip6tables -A FORWARD -p udp -d {{ forwarded_port.ip }} --dport {{ forwarded_port.dest_port }} -j ACCEPT
+{% endfor %}
+{% endif %}
+{% endif %}
 
 # Accept icmp ping requests.
 iptables -A INPUT -p icmp -j ACCEPT
+ip6tables -A INPUT -p icmp -j ACCEPT
 
 
 # Custom rules after standard rules Have been applied
@@ -107,25 +197,37 @@ iptables -A INPUT -p icmp -j ACCEPT
 {% if firewall_enable_forwarding %}
 # Enable forwarding
 echo 1 > /proc/sys/net/ipv4/ip_forward
+/usr/sbin/sysctl -w net.ipv6.conf.all.forwarding=1
 {% endif %}
 
 {% if firewall_enable_masquerade %}
 #Enable Masquerade
 {% for interface in firewall_masquerade_interfaces %}
 iptables -t nat -A POSTROUTING -o {{ interface }} -j MASQUERADE
+{% if firewall_enable_ipv6 %}
+ip6tables -t nat -A POSTROUTING -o {{ interface }} -j MASQUERADE
+{% endif %}
 {% endfor %}
 {% endif %}
 
-{% if firewall_log_dropped_packets %}
+{% if firewall_debug %}
 # Log EVERYTHING (ONLY for Debug).
 iptables -A INPUT -j LOG
 iptables -A FORWARD -j LOG
+{% if firewall_enable_ipv6 %}
+ip6tables -A INPUT -j LOG
+ip6tables -A FORWARD -j LOG
+{% endif %}
 {% endif %}
 
 {% if firewall_log_dropped_packets %}
 # Log other incoming requests (all of which are dropped) at 15/minute max.
 iptables -A INPUT -m limit --limit 15/minute -j LOG --log-level 7 --log-prefix "Dropped by firewall: "
 iptables -A FORWARD -m limit --limit 15/minute -j LOG --log-level 7 --log-prefix "Dropped by firewall: "
+{% if firewall_enable_ipv6 %}
+ip6tables -A INPUT -m limit --limit 15/minute -j LOG --log-level 7 --log-prefix "Dropped by firewall: "
+ip6tables -A FORWARD -m limit --limit 15/minute -j LOG --log-level 7 --log-prefix "Dropped by firewall: "
+{% endif %}
 {% endif %}
 
 {% raw %}
@@ -139,12 +241,21 @@ iptables -P INPUT ACCEPT
 iptables -P FORWARD ACCEPT
 iptables -P OUTPUT ACCEPT
 
+ip6tables -P INPUT ACCEPT
+ip6tables -P FORWARD ACCEPT
+ip6tables -P OUTPUT ACCEPT
+
 {% if firewall_flush_rules_and_chains %}
 # Remove all rules and chains.
 iptables -t nat -F
 iptables -t mangle -F
 iptables -F
 iptables -X
+
+ip6tables -t nat -F
+ip6tables -t mangle -F
+ip6tables -F
+ip6tables -X
 {% endif %}
 {% raw %}
 }
