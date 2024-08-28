@@ -4,6 +4,9 @@ firewall_enabled_at_boot: true
 # Set to true to ensure other firewall management software is disabled. This deafults to True to prevent conflicts which will he hard to debug
 firewall_disable_ufw: true
 
+# Enable IPv6, default is false
+firewall_enable_ipv6: false
+
 # Wether to flush or not all rules before starting to ensure a clean start
 firewall_flush_rules_and_chains: true
 
@@ -35,35 +38,53 @@ firewall_allowed_udp_ports: []
 
 
 # Redirected ports. This is set for ports to ber redirected to different ports on the same host
-firewall_redirected_tcp_ports: []
+firewall_redirected_tcp_ports:
+    IPv4: []
+    IPv6: []
 
-firewall_redirected_udp_ports: []
+firewall_redirected_udp_ports:
+    IPv4: []
+    IPv6: []
 
 # Forwarded Ports
-firewall_forwarded_tcp_ports: []
+firewall_forwarded_tcp_ports:
+    IPv4: []
+    IPv6: []
 
-firewall_forwarded_udp_ports: []
+firewall_forwarded_udp_ports:
+    IPv4: []
+    IPv6: []
 
 # This is a list to add either untrusted hosts or networks. It will deny all traffic to this networks and within this networks
 # Should be used when we want to block an external host that is attaking us.
 # This will be the rules evaluated on top of every other rules to block at the earliest
 # Casn use a single ip or a subnet in CIDR notation
-firewall_blacklist: []
+firewall_blacklist:
+    IPv4: []
+    IPv6: []
 
 # This is a list to add either trusted hosts or networks. It will allow all traffic to this networks and within this networks
 # useful to add all internal private networks
 # Casn use a single ip or a subnet in CIDR notation
-firewall_whitelist: []
+firewall_whitelist: 
+    IPv4: []
+    IPv6: []
 
 # Example: Whitelist all common private subnets
 # firewall_whitelist:
-#   - 192.168.0.0/16
-#   - 10.0.0.0/8
-#   - 172.16.0.0/12
+#   IPv4:
+#     - 192.168.0.0/16
+#     - 10.0.0.0/8
+#     - 172.16.0.0/12
+#   IPv6:
+#     - 
+
+
 
 ## Custom Rules
 # Custom rules are used to define the raw iptables rules when needing special use cases,
 # NOTE: you will have to specify the entire iptables command in order to work
+# This can do ipv4 and ipv6 rules you need to write the full rule
 
 # Additional rules are custom rules to be applied before the standarrd rules
 firewall_additional_rules_pre: []
