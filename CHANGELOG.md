@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 
+## [1.0.0] - 2020-08-28
+### Added
+- Support for IPv6
+- BREAKING CHANGE - Following configuration varieables have been namespaced to support IPv6 - firewall_redirected_tcp_ports, firewall_redirected_udp_ports, firewall_forwarded_tcp_ports, firewall_forwarded_udp_ports, firewall_blacklist, firewall_whitelist. Refer to the defaults/main.yml file for reference how to use the variables.
+
 ## [0.3.1] - 2020-08-23
 ### Fixed
 - Bug where playbook failed when trying to disable ufw and ufw was not installed

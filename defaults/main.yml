@@ -47,6 +47,16 @@ firewall_redirected_udp_ports:
     IPv6: []
 
 # Forwarded Ports
+# Example
+# firewall_forwarded_tcp_ports:
+#   IPv4:
+#     - port: "2223"
+#       ip: "{{ LAN_IP }}.3"
+#       dest_port: "22"
+
+#     - port: "2224"
+#       ip: "{{ LAN_IP }}.4"
+#       dest_port: "22"
 firewall_forwarded_tcp_ports:
     IPv4: []
     IPv6: []
