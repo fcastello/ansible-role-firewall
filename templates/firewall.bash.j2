@@ -35,7 +35,7 @@ ip6tables -P INPUT DROP
 ip6tables -P FORWARD DROP
 
 # All hosts and networks that have been blacklisted
-{% if firewall_forwarded_udp_ports.IPv4 %}
+{% if firewall_forwarded_udp_ports.get('IPv4', []) %}
 {% for blacklisted in firewall_blacklist.IPv4 %}
 iptables -t filter -I INPUT -s {{ blacklisted }} -j DROP
 iptables -t filter -I FORWARD -s {{ blacklisted }} -j DROP
@@ -43,7 +43,7 @@ iptables -t filter -I FORWARD -s {{ blacklisted }} -j DROP
 {% endif %}
 
 {% if firewall_enable_ipv6 %}
-{% if firewall_forwarded_udp_ports.IPv6 %}
+{% if firewall_forwarded_udp_ports.get('IPv6', []) %}
 {% for blacklisted in firewall_blacklist.IPv6 %}
 ip6tables -t filter -I INPUT -s {{ blacklisted }} -j DROP
 ip6tables -t filter -I FORWARD -s {{ blacklisted }} -j DROP
@@ -62,13 +62,13 @@ iptables -A INPUT -i lo -j ACCEPT
 
 # Port Redirection
 {# Add a rule for each redirected port #}
-{% if firewall_redirected_tcp_ports.IPv4 %}
+{% if firewall_redirected_tcp_ports.get('IPv4', []) %}
 {% for redirected_port in firewall_redirected_tcp_ports.IPv4 %}
 iptables -t nat -I PREROUTING -p tcp --dport {{ redirected_port.src }} -j REDIRECT --to-port {{ redirected_port.dest }}
 iptables -t nat -I OUTPUT -p tcp -o lo --dport {{ redirected_port.src }} -j REDIRECT --to-port {{ redirected_port.dest }}
 {% endfor %}
 {% endif %}
-{% if firewall_redirected_udp_ports.IPv4 %}
+{% if firewall_redirected_udp_ports.get('IPv4', []) %}
 {% for redirected_port in firewall_redirected_udp_ports.IPv4 %}
 iptables -t nat -I PREROUTING -p udp --dport {{ redirected_port.src }} -j REDIRECT --to-port {{ redirected_port.dest }}
 iptables -t nat -I OUTPUT -p udp -o lo --dport {{ redirected_port.src }} -j REDIRECT --to-port {{ redirected_port.dest }}
@@ -76,13 +76,13 @@ iptables -t nat -I OUTPUT -p udp -o lo --dport {{ redirected_port.src }} -j REDI
 {% endif %}
 
 {% if firewall_enable_ipv6 %}
-{% if firewall_redirected_tcp_ports.IPv6 %}
+{% if firewall_redirected_tcp_ports.get('IPv6', []) %}
 {% for redirected_port in firewall_redirected_tcp_ports.IPv6 %}
 iptables -t nat -I PREROUTING -p tcp --dport {{ redirected_port.src }} -j REDIRECT --to-port {{ redirected_port.dest }}
 iptables -t nat -I OUTPUT -p tcp -o lo --dport {{ redirected_port.src }} -j REDIRECT --to-port {{ redirected_port.dest }}
 {% endfor %}
 {% endif %}
-{% if firewall_forwarded_udp_ports.IPv6 %}
+{% if firewall_forwarded_udp_ports.get('IPv6', []) %}
 {% for redirected_port in firewall_redirected_udp_ports.IPv6 %}
 iptables -t nat -I PREROUTING -p udp --dport {{ redirected_port.src }} -j REDIRECT --to-port {{ redirected_port.dest }}
 iptables -t nat -I OUTPUT -p udp -o lo --dport {{ redirected_port.src }} -j REDIRECT --to-port {{ redirected_port.dest }}
@@ -103,7 +103,7 @@ ip6tables -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT
 {% endif %}
 
 # All hosts and networks that have been whitelisted
-{% if firewall_forwarded_udp_ports.IPv4 %}
+{% if firewall_whitelist.get('IPv4', []) %}
 {% for whitelisted in firewall_whitelist.IPv4 %}
 iptables -I INPUT -s {{ whitelisted }} -j ACCEPT
 iptables -I FORWARD -s {{ whitelisted }} -j ACCEPT
@@ -113,7 +113,7 @@ iptables -I FORWARD -d {{ whitelisted }} -j ACCEPT
 {% endif %}
 
 {% if firewall_enable_ipv6 %}
-{% if firewall_forwarded_udp_ports.IPv6 %}
+{% if firewall_whitelist.get('IPv6', []) %}
 {% for whitelisted in firewall_whitelist.IPv6 %}
 ip6tables -I INPUT -s {{ whitelisted }} -j ACCEPT
 ip6tables -I FORWARD -s {{ whitelisted }} -j ACCEPT
@@ -147,7 +147,7 @@ ip6tables -A FORWARD -p tcp -m tcp --dport {{ port }} -j ACCEPT
 
 
 # Port Forwards
-{% if firewall_forwarded_tcp_ports.IPv4 %}
+{% if firewall_forwarded_tcp_ports.get('IPv4', []) %}
 {% for forwarded_port in firewall_forwarded_tcp_ports.IPv4 %}
 {% for interface in firewall_masquerade_interfaces %}
 iptables -A PREROUTING -t nat -i {{ interface }} -p tcp --dport {{ forwarded_port.port }} -j DNAT --to {{ forwarded_port.ip }}:{{ forwarded_port.dest_port }}
@@ -155,7 +155,7 @@ iptables -A PREROUTING -t nat -i {{ interface }} -p tcp --dport {{ forwarded_por
 iptables -A FORWARD -p tcp -d {{ forwarded_port.ip }} --dport {{ forwarded_port.dest_port }} -j ACCEPT
 {% endfor %}
 {% endif %}
-{% if firewall_forwarded_udp_ports.IPv4 %}
+{% if firewall_forwarded_udp_ports.get('IPv4', []) %}
 {% for forwarded_port in firewall_forwarded_udp_ports.IPv4 %}
 {% for interface in firewall_masquerade_interfaces %}
 iptables -A PREROUTING -t nat -i {{ interface }} -p udp --dport {{ forwarded_port.port }} -j DNAT --to {{ forwarded_port.ip }}:{{ forwarded_port.dest_port }}
@@ -165,7 +165,7 @@ iptables -A FORWARD -p udp -d {{ forwarded_port.ip }} --dport {{ forwarded_port.
 {% endif %}
 
 {% if firewall_enable_ipv6 %}
-{% if firewall_forwarded_tcp_ports.IPv6 %}
+{% if firewall_forwarded_tcp_ports.get('IPv6', []) %}
 {% for forwarded_port in firewall_forwarded_tcp_ports.IPv6 %}
 {% for interface in firewall_masquerade_interfaces %}
 ip6tables -A PREROUTING -t nat -i {{ interface }} -p tcp --dport {{ forwarded_port.port }} -j DNAT --to {{ forwarded_port.ip }}:{{ forwarded_port.dest_port }}
@@ -173,7 +173,7 @@ ip6tables -A PREROUTING -t nat -i {{ interface }} -p tcp --dport {{ forwarded_po
 ip6tables -A FORWARD -p tcp -d {{ forwarded_port.ip }} --dport {{ forwarded_port.dest_port }} -j ACCEPT
 {% endfor %}
 {% endif %}
-{% if firewall_forwarded_udp_ports.IPv6 %}
+{% if firewall_forwarded_udp_ports.get('IPv6', []) %}
 {% for forwarded_port in firewall_forwarded_udp_ports.IPv6 %}
 {% for interface in firewall_masquerade_interfaces %}
 ip6tables -A PREROUTING -t nat -i {{ interface }} -p udp --dport {{ forwarded_port.port }} -j DNAT --to {{ forwarded_port.ip }}:{{ forwarded_port.dest_port }}
